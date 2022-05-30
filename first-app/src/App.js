@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import {Message} from "./Message";
+import {MessageList} from "./components";
 
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <div className="App">
         <img src={logo} className="App-logo" alt="logo"/>
 
-      <Message/>
+      <MessageList/>
     </div>
   );
 }
