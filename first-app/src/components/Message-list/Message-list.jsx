@@ -1,73 +1,92 @@
-import styles from './message.module.css';
 import React, {useState, useEffect, useRef} from "react";
 import {Input, InputAdornment} from '@mui/material';
+import styled from "@emotion/styled";
 import {Send} from '@mui/icons-material';
 import {Message} from "./Message";
 
-const BOT_MESSAGE = {author: 'Bot', message: 'Hello from bot'};
+
+const InputStyles = styled(Input)`
+  color: #9a9fa1;
+  padding: 10px 15px;
+  font-size: ${(props) => {
+  return "15px";
+}};
+`;
+
+const IconStyles = styled(Send)`
+  color: #2b5278;
+`;
+
+
+const BOT_MESSAGE = () => ({
+  author: "Bot",
+  message: "Hello from bot",
+  date: new Date(),
+});
 
 export const MessageList = () => {
-
-  const [value, setValue] = useState('');
-  const [messages, setMessages] = useState([BOT_MESSAGE]);
+  const [value, setValue] = useState("");
+  const [messages, setMessages] = useState([BOT_MESSAGE()]);
 
   const ref = useRef();
 
   useEffect(() => {
-    ref.current?.focus();
-  }, [])
+    if (ref.current) {
+      ref.current.scrollTo(0, ref.current.scrollHeight);
+    }
+  }, [messages]);
 
   useEffect(() => {
-
     const lastMessage = messages[messages.length - 1];
     let timerId = null;
 
-    if (messages.length && lastMessage?.author === 'User') {
+    if (messages.length && lastMessage?.author === "User") {
       timerId = setTimeout(() => {
-        setMessages([...messages, BOT_MESSAGE])
-      }, 3000)
+        setMessages([...messages, BOT_MESSAGE()]);
+      }, 1000);
     }
 
     return () => {
-      clearTimeout(timerId)
-    }
+      clearInterval(timerId);
+    };
+  }, [messages]);
 
-  }, [messages])
-
-  const sendNewMessage = () => {
+  const sendMessage = () => {
     if (value) {
-      setMessages([...messages, {author: 'User', message: value}]);
-      setValue('');
+      setMessages([
+        ...messages,
+        { author: "User", message: value, date: new Date() },
+      ]);
+      setValue("");
     }
-  }
+  };
+
+  const handlePressInput = ({ code }) => {
+    if (code === "Enter" ||  code === 'NumpadEnter') {
+      sendMessage();
+    }
+  };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.header__title}>Chat List</h1>
-      {messages.map((message, index) => {
-        return <Message message={message} key={index}/>
-      })}
-      <div className="container__wrap">
-        <Input type="text"
-               label="Your message"
-               placeholder="Your message"
-               className={styles.chat__list__input}
-               ref={ref}
-               value={value}
-               onChange={e => setValue(e.target.value)}
-               onKeyDown={e => {
-                 if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                   sendNewMessage();
-                 }
-               }}
-               fullWidth={true}
-               endAdornment={
-                 <InputAdornment position="end">
-                   {value && <Send onClick={sendNewMessage}/>}
-                 </InputAdornment>
-               }
-        />
+    <>
+      <div ref={ref}>
+        {messages.map((message, index) => (
+          <Message message={message} key={message?.date ?? index} />
+        ))}
       </div>
-    </div>
+
+      <InputStyles
+        placeholder="enter message ..."
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handlePressInput}
+        fullWidth={true}
+        endAdornment={
+          <InputAdornment position="end">
+            {value && <IconStyles onClick={sendMessage} />}
+          </InputAdornment>
+        }
+      />
+    </>
   );
 };
