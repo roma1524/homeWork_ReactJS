@@ -1,0 +1,13 @@
+.header {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+
+    margin-right: 30px;
+    color: white;
+    height: 50px;
+}
+
+.header:hover {
+    cursor: pointer;
+}
