@@ -1,9 +1,11 @@
 import React, {useState, useEffect, useRef, useCallback} from "react";
 import {Input, InputAdornment} from '@mui/material';
 import {useParams} from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
 import styled from "@emotion/styled";
 import {Send} from '@mui/icons-material';
 import {Message} from "./Message";
+import { sendMessage, deleteMessage} from "../../store/messages";
 
 
 const InputStyles = styled(Input)`
@@ -19,22 +21,20 @@ const IconStyles = styled(Send)`
 `;
 
 
-const getBotMessage = () => ({
-  author: "Bot",
-  message: "Hello from bot",
-  date: new Date(),
-});
+// const getBotMessage = () => ({
+//   author: "Bot",
+//   message: "Hello from bot",
+//   date: new Date(),
+// });
 
 export const MessageList = () => {
-
   const {roomId} = useParams();
+  const dispatch = useDispatch();
+  const messages = useSelector(
+    (state) => state.messages.messages[roomId] ?? []
+  );
 
   const [value, setValue] = useState("");
-  const [messagesList, setMessagesList] = useState({
-    Олег: [getBotMessage()],
-    Марина: [],
-    Ержан: [],
-  });
 
   const ref = useRef();
 
@@ -42,50 +42,42 @@ export const MessageList = () => {
     if (ref.current) {
       ref.current.scrollTo(0, ref.current.scrollHeight);
     }
-  }, [messagesList]);
+  }, [messages]);
 
-  const sendMessage = useCallback((message, author = 'User') => {
+  const send = useCallback((message, author = 'User') => {
     if (message) {
-      setMessagesList((state) => ({
-        ...state,
-        [roomId]: [
-          ...(state[roomId] ?? []),
-          {author, message, date: new Date()},]
-      }));
+      dispatch(sendMessage(roomId, {message, author}))
       setValue("");
     }
-  }, [roomId]);
+  }, [dispatch, roomId]);
 
-  useEffect(() => {
-    const messages = messagesList[roomId] ?? [];
-    const lastMessage = messages[messages.length - 1];
-    let timerId = null;
-
-    if (messages.length && lastMessage?.author === "User") {
-      timerId = setTimeout(() => {
-        sendMessage('Hello from Bot', 'Bot');
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(timerId);
-    };
-  }, [sendMessage, messagesList, roomId]);
+  // useEffect(() => {
+  //   const lastMessage = messages[messages.length - 1];
+  //   let timerId = null;
+  //
+  //   if (messages.length && lastMessage?.author === "User") {
+  //     timerId = setTimeout(() => {
+  //       send('Hello from Bot', 'Bot');
+  //     }, 1000);
+  //   }
+  //
+  //   return () => {
+  //     clearInterval(timerId);
+  //   };
+  // }, [send, messages, roomId]);
 
 
   const handlePressInput = ({code}) => {
     if (code === "Enter" || code === 'NumpadEnter') {
-      sendMessage(value);
+      send(value);
     }
   };
-
-  const messages = messagesList[roomId] ?? [];
 
   return (
     <>
       <div ref={ref}>
         {messages.map((message, index) => (
-          <Message message={message} key={message?.date ?? index}/>
+          <Message message={message} key={message.id}/>
         ))}
       </div>
 
@@ -97,7 +89,7 @@ export const MessageList = () => {
         fullWidth={true}
         endAdornment={
           <InputAdornment position="end">
-            {value && <IconStyles onClick={() => sendMessage(value)}/>}
+            {value && <IconStyles onClick={() => send(value)}/>}
           </InputAdornment>
         }
       />
