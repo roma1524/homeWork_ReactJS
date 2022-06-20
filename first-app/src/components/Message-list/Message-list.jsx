@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import styled from "@emotion/styled";
 import {Send} from '@mui/icons-material';
 import {Message} from "./Message";
-import { sendMessage, deleteMessage} from "../../store/messages";
+import { sendMessage } from "../../store/messages";
 
 
 const InputStyles = styled(Input)`
@@ -77,7 +77,7 @@ export const MessageList = () => {
     <>
       <div ref={ref}>
         {messages.map((message, index) => (
-          <Message message={message} key={message.id}/>
+          <Message message={message} key={message.id} roomId={roomId}/>
         ))}
       </div>
 

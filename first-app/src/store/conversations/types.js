@@ -1,2 +1,1 @@
-export const CREARE_CONVERSATION = "@conversation/create conversation";
-export const DELETE_CONVERSATION = "@conversation/delete conversation";
+export const CREATE_CONVERSATION = "@conversation/create conversation";

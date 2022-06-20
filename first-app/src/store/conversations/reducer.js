@@ -1,12 +1,13 @@
-import { CREARE_CONVERSATION, DELETE_CONVERSATION } from './types';
+import { CREATE_CONVERSATION } from './types';
+import { DELETE_CONVERSATION } from "../types";
 
 const initialState = {
- conversations: ['Олег', 'Марина', 'Ержан'],
+ conversations: ['room1', 'room2', 'room3'],
 }
 
 export const conversationsReducer = (state = initialState, action) => {
   switch (action.type) {
-    case CREARE_CONVERSATION:
+    case CREATE_CONVERSATION:
       return {
         ...state,
         conversations: [...state.conversations, action.payload ],

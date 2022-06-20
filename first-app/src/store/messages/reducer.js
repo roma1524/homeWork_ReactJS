@@ -1,9 +1,11 @@
 import { SEND_MESSAGE, DELETE_MESSAGE} from './types';
 import {nanoid} from "nanoid";
+import {DELETE_CONVERSATION} from "../types";
 
 const initialState = {
   messages: {
-    Олег: [{
+    room1: [
+      {
       author: "Bot",
       message: "Hello from bot",
       date: new Date(),
@@ -36,9 +38,13 @@ export const messagesReducer = (state = initialState, action) => {
       ...state,
       messages: {
         ...state.messages,
-        [action.payload.roomId]: action.message[action.payload.roomId].filter((message) => message.id !== action.payload.messageId)
+        [action.payload.roomId]: action.messages[action.payload.roomId].filter((message) => message.id !== action.payload.messageId)
       },
     };
+    case DELETE_CONVERSATION:
+      delete state.messages[action.payload];
+
+      return state;
     default:
       return state;
   }
